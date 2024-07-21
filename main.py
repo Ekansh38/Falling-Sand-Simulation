@@ -1,7 +1,14 @@
+import colorsys
 import random
 
 import pygame
 from pygame.math import Vector2
+
+
+def hsv_to_rgb(h, s, v):
+    r, g, b = colorsys.hsv_to_rgb(h, s, v)
+    return int(r * 255), int(g * 255), int(b * 255)
+
 
 # Constants
 
@@ -14,12 +21,13 @@ COLS = SCREEN_SIZE.x // SIZE
 
 
 class Grain:
-    def __init__(self, grid_pos):
+    def __init__(self, grid_pos, color):
         self.grid_pos = grid_pos
         self.pixel_pos = Vector2(self.grid_pos.x * SIZE, self.grid_pos.y * SIZE)
         self.at_rest = False
         self.vel = 0
         self.acc = 0.1
+        self.color = color
 
     def check_collision(self, grains):
         if not self.at_rest:
@@ -90,15 +98,9 @@ class Grain:
             self.grid_pos = Vector2(self.pixel_pos.x // SIZE, self.pixel_pos.y // SIZE)
 
     def draw(self, screen):
-        color = "yellow"
-        if self.at_rest:
-            color = "darkgreen"
-            if self.grid_pos.y <= ROWS // 1.5:
-                color = "grey"
-
         pygame.draw.rect(
             screen,
-            color,
+            self.color,
             ((self.pixel_pos.x - SIZE, self.pixel_pos.y - SIZE), (SIZE, SIZE)),
         )
 
@@ -111,6 +113,8 @@ clock = pygame.time.Clock()
 running = True
 
 grains = []
+hue = 0
+
 
 # Main Loop
 while running:
@@ -120,13 +124,19 @@ while running:
 
     screen.fill("black")
 
+    hue += 0.01  # Change this value to control the speed of the color change
+    if hue > 1:
+        hue = 0  # Reset hue when it goes past 1
+
+    color = hsv_to_rgb(hue, 1, 1)  # Full saturation and value
+
     mouse_pos = pygame.mouse.get_pos()
     mouse_pos = Vector2(mouse_pos[0], mouse_pos[1])
     mouse_pos.x = mouse_pos.x // SIZE
     mouse_pos.y = mouse_pos.y // SIZE
 
     if pygame.mouse.get_pressed()[0]:
-        grain = Grain(mouse_pos)
+        grain = Grain(mouse_pos, color)
         grains.append(grain)
 
     for grain in grains:
