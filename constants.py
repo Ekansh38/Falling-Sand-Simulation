@@ -1,0 +1,9 @@
+from pygame.math import Vector2
+
+SCREEN_SIZE = Vector2(1280, 720)
+FPS = 60
+
+RAINBOW_SPEED = 0.001
+SIZE = 10
+ROWS = SCREEN_SIZE.y // SIZE
+COLS = SCREEN_SIZE.x // SIZE
